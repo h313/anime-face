@@ -1,41 +1,37 @@
-import io
-import os
-import requests
+#!/usr/bin/env python3
+from github import Github
+import numpy as np
+import argparse
 
-# Import Google Cloud client libraries
-from google.cloud import vision
-from google.cloud.vision import types
+from profile_tester import get_profile_image, check_image
 
-# Import Graphene
-from graphene import ObjectType, String, Schema
+parser = argparse.ArgumentParser(description='Run the test!')
+parser.add_argument('api_key', metavar='KEY', type=str, nargs='+',
+                    help='An API key for GitHub')
 
-# Instantiate a client
-client = vision.ImageAnnotatorClient()
+has_anime_propic = np.empty(1000000)
+user_activity = np.zeros(1000000)
 
-# Check an image for anime profile picture
-def check_image(img_bin):
-    # Convert into an image
-    image = types.Image(content=img_bin)
-
-    # Performs label detection on the image file
-    response = client.label_detection(image=image)
-    labels = response.label_annotations
-
-    if "Anime" in labels:
-        return True
-    else:
-        return False
-
-
-def get_profile_image(username):
-  r = requests.get('https://github.com/' + username + '.png', stream=True)
-  if r.status_code == 200:
-    return r.raw
 
 def main():
-  img = get_profile_image('h313')
-  if check_image(img):
-    print('is_anime_image')
+    # Loop through the first one million users
+    for i in range(0, 1000000):
+        g = Github("access_token")
+        user = g.get_user(str(i))
+
+        # Add every event ever into the list
+        event_count = 0
+        for event in user.get_events():
+            event_count += 1
+
+        # If they only have one event, that's an inactive user. Don't count them
+        if event_count > 1:
+            user_activity[i] = event_count
+
+            # Check if profile picture is anime
+            if check_image(get_profile_image(user.avatar_url, "img.png")):
+                has_anime_propic[i] = True
+
 
 if __name__ == '__main__':
-  main()
+    main()
