@@ -32,8 +32,8 @@ def check_image(img_file):
 
 
 # Download profile picture to a specified location
-def get_profile_image(username, file_location):
-    r = requests.get('https://github.com/' + username + '.png', stream=True)
+def get_profile_image(url, file_location):
+    r = requests.get(url, stream=True)
 
     if r.status_code == 200:
         with open(file_location, 'wb') as f:
