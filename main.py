@@ -16,18 +16,27 @@ user_activity = []
 def main():
     g = Github("")
     f = open("data.csv", "a")
-    # Loop through the first fifty thousand users
-    for i in range(0, 1000):
-        print(str(i) + ': ' + str(g.get_rate_limit().core.remaining))
-        user = g.get_user(str(i))
+    i = 0
+    users = g.get_users()
+
+    for user in users:
+        print('Remaining queries: ' + str(g.get_rate_limit().core.remaining))
+
+        if user.id <= 4117:
+            continue
+        elif i == 1000:
+            break
+        else:
+            i += 1
 
         # Add every event ever into the list
         event_count = 0
         for event in user.get_events():
             event_count += 1
 
-        # If they only have one event, that's an inactive user. Don't count them
-        if event_count > 1:
+        print('event_count: ' + str(event_count))
+        # If they only no events, that's an inactive user. Don't count them
+        if event_count >= 1:
             user_activity.append(event_count)
 
             # Check if profile picture is anime
@@ -38,8 +47,9 @@ def main():
                 has_anime_propic.append(False)
                 has_anime_propic_bool = False
 
-            print(str(has_anime_propic_bool) + ',' + str(event_count) + '\n')
-            f.write(str(has_anime_propic_bool) + ',' + str(event_count) + '\n')
+            print('has_anime_propic: ' + str(has_anime_propic_bool) + '\n')
+            f.write(str(user.id) + ',' + str(has_anime_propic_bool) + ',' + str(event_count) + '\n')
+            f.flush()
 
     f.close
 
