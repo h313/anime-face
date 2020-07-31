@@ -17,17 +17,15 @@ def main():
     g = Github("")
     f = open("data.csv", "a")
     i = 0
-    users = g.get_users()
-
-    for user in users:
-        print('Remaining queries: ' + str(g.get_rate_limit().core.remaining))
-
-        if user.id <= 4117:
+    
+    print(g.get_rate_limit())
+    for github_id in range(1200000, 1201000):
+        try:
+            user = g.get_user(github_id)
+        except Exception:
             continue
-        elif i == 1000:
-            break
-        else:
-            i += 1
+        print('Remaining queries: ' + str(g.get_rate_limit().core.remaining))
+        print('Current user_id: ' + str(user.id))
 
         # Add every event ever into the list
         event_count = 0
