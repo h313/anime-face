@@ -25,10 +25,11 @@ def check_image(img_file):
     response = client.label_detection(image=image)
     labels = response.label_annotations
 
-    if "Anime" in labels:
-        return True
-    else:
-        return False
+    for item in labels:
+        if item.description == "Anime":
+            return True
+    
+    return False
 
 
 # Download profile picture to a specified location
@@ -44,7 +45,7 @@ def get_profile_image(url, file_location):
 
 # Test if profile image getter works
 def main():
-  img = get_profile_image('h313', 'file.png')
+  img = get_profile_image('https://avatars1.githubusercontent.com/u/5235114?s=400&u=fb7199718b414c4fa6ebc86fabef521360b0d787&v=4', 'file.png')
   if check_image(img):
     print('is_anime_image')
 
